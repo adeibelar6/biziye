@@ -5,8 +5,11 @@ import { validarSesion } from '$lib/server/auth';
 
 if (!building) {
 	await inicializarBD();
-	// El motor de recordatorios (cron) se engancha aquí; ver Fase 3.
-	const { iniciarCron } = await import('$lib/server/recordatorios/cron');
+	const { iniciarCron, registrarEvaluador } = await import('$lib/server/recordatorios/cron');
+	const { evaluadorRecordatorios } = await import('$lib/server/recordatorios/motor');
+	const { evaluadorReenganche } = await import('$lib/server/recordatorios/reenganche');
+	registrarEvaluador(evaluadorRecordatorios);
+	registrarEvaluador(evaluadorReenganche);
 	iniciarCron();
 }
 

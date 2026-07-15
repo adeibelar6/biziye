@@ -110,3 +110,40 @@ partir de las 19:00 si la IA está activa.
 Un `setInterval` por minuto dentro del propio proceso Node (no cron del sistema)
 con una lista de evaluadores idempotentes. Suficiente para un solo usuario,
 cero dependencias, y sobrevive al HMR de dev con una guardia en `globalThis`.
+
+## Fase 3 — Vida práctica
+
+**Los recordatorios son un espejo sincronizado desde la capa de datos.**
+Cada entrada con aviso (suscripción, vencimiento, tarea con fecha, deseo
+enfriándose) mantiene UNA fila en `recordatorios`, actualizada dentro de
+`crearEntrada`/`editarEntrada`/`borrarEntrada`. Al vivir en la capa de datos
+ningún camino de escritura (API, formularios, chat, cola offline) puede
+olvidarse de sincronizar. El cron solo mira `proximo_aviso` y dispara.
+
+**Disparo idempotente: o se apaga o se empuja al futuro.**
+Un aviso de regla única se desactiva al disparar; uno recurrente avanza
+`fecha_objetivo` al periodo siguiente (conservando el día del mes, con tope en
+febrero). Ejecutar el evaluador de más nunca duplica notificaciones.
+
+**El payload del usuario no se reescribe solo (con una excepción).**
+`proxima_renovacion` guarda lo que escribió el usuario; las vistas calculan la
+«renovación efectiva» avanzando periodos (src/lib/vida-practica.ts). La
+excepción es el deseo: al cumplir 30 días el cron sí persiste
+`estado: disponible`, porque ese cambio es el producto (y la vista además lo
+calcula por si el cron aún no pasó).
+
+**Web Push con generateSW + importScripts.**
+Cambiar a injectManifest solo para dos listeners era pagar mantenimiento de un
+service worker entero. `static/push-sw.js` (push + notificationclick) se
+incorpora al SW generado con `workbox.importScripts`. Sin claves VAPID en
+`.env`, los avisos caen al log del servidor y la app sigue entera
+(`npm run generar-vapid` los activa).
+
+**Anti-abandono con techo y horario.**
+14 días sin registrar → aviso borde (5 variantes rotadas por día, como manda
+biziye.md). Máximo uno por semana (estado en `config`) y solo de 10:00 a 21:00:
+el humor negro a las 4 de la mañana no re-engancha a nadie.
+
+**El enfriamiento se respeta también en el servidor.**
+«Lo compro» sobre un deseo aún enfriándose devuelve error aunque alguien fuerce
+el formulario: los 30 días son la función, no una sugerencia de interfaz.

@@ -47,6 +47,9 @@ export default defineConfig({
 			},
 			workbox: {
 				globPatterns: ['client/**/*.{js,css,ico,png,svg,webp,woff2}', 'prerendered/**/*.html'],
+				// Notificaciones: los manejadores de push viven en un archivo estático
+				// que el SW generado importa (generateSW no admite listeners propios).
+				importScripts: ['push-sw.js'],
 				navigateFallback: null,
 				cleanupOutdatedCaches: true,
 				maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,

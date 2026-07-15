@@ -1,5 +1,6 @@
 import { and, desc, eq, gte, ilike, isNull, lt, lte, or, sql, type SQL } from 'drizzle-orm';
 import { bd, tablas } from '$lib/server/db';
+import { sincronizarRecordatorioDeEntrada } from '$lib/server/recordatorios/motor';
 import { definicion, type Payload } from '$lib/tipos';
 import { diaLocal, diaSemana, horaLocal } from '$lib/fechas';
 
@@ -130,12 +131,16 @@ export async function crearEntrada(
 			.values({ id: datos.id, ...valores })
 			.onConflictDoNothing({ target: tablas.entradas.id })
 			.returning();
-		if (fila) return fila;
+		if (fila) {
+			await sincronizarRecordatorioDeEntrada(fila);
+			return fila;
+		}
 		const existente = await obtenerEntrada(userId, datos.id);
 		if (existente) return existente;
 	}
 
 	const [fila] = await bd().insert(tablas.entradas).values(valores).returning();
+	await sincronizarRecordatorioDeEntrada(fila);
 	return fila;
 }
 
@@ -161,6 +166,7 @@ export async function editarEntrada(
 			)
 		)
 		.returning();
+	if (fila) await sincronizarRecordatorioDeEntrada(fila);
 	return fila ?? null;
 }
 
@@ -175,7 +181,8 @@ export async function borrarEntrada(userId: string, id: string): Promise<boolean
 				isNull(tablas.entradas.borradoEn)
 			)
 		)
-		.returning({ id: tablas.entradas.id });
+		.returning();
+	if (fila) await sincronizarRecordatorioDeEntrada(fila);
 	return Boolean(fila);
 }
 

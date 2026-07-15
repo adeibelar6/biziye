@@ -134,6 +134,23 @@
 		</section>
 	{/if}
 
+	{#if data.avisos.length > 0}
+		<section class="tarjeta aparece">
+			<h2 class="titulo-seccion">Avisos a la vista</h2>
+			<ul class="lista-avisos">
+				{#each data.avisos as aviso (aviso.id)}
+					<li class="fila aviso">
+						<Icono nombre="campana" tamano={15} grosor={2} />
+						<a href={aviso.entradaId ? `/entrada/${aviso.entradaId}` : aviso.url} class="texto-aviso">
+							{aviso.titulo}
+							<small class="texto-suave">{fechaRelativa(new Date(aviso.fechaObjetivo))}</small>
+						</a>
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
+
 	{#if tareasVisibles.length > 0}
 		<section class="tarjeta aparece">
 			<div class="fila fila--separada">
@@ -246,6 +263,37 @@
 
 	.ver-todas {
 		color: var(--tinta-2);
+	}
+
+	.lista-avisos {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.aviso {
+		min-height: 44px;
+		border-bottom: 1px solid var(--linea);
+		color: var(--aviso);
+	}
+
+	.aviso:last-child {
+		border-bottom: none;
+	}
+
+	.texto-aviso {
+		color: inherit;
+		flex: 1;
+		padding: 0.4rem 0;
+		font-size: 0.92rem;
+		font-weight: 600;
+	}
+
+	.texto-aviso small {
+		font-weight: 400;
+		margin-left: 0.35rem;
 	}
 
 	.lista-tareas {

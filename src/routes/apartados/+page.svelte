@@ -19,10 +19,45 @@
 			badge: null
 		},
 		{
+			ruta: '/apartados/cine',
+			icono: 'cine',
+			nombre: 'Cine y series',
+			descripcion: 'Pendientes, ranking y estadísticas',
+			badge: null
+		},
+		{
+			ruta: '/apartados/suscripciones',
+			icono: 'repetir',
+			nombre: 'Suscripciones',
+			descripcion: 'Lo que se cobra solo, con aviso',
+			badge: null
+		},
+		{
+			ruta: '/apartados/vencimientos',
+			icono: 'calendario',
+			nombre: 'Vencimientos',
+			descripcion: 'DNI, ITV, seguros… con antelación',
+			badge: null
+		},
+		{
+			ruta: '/apartados/prestamos',
+			icono: 'intercambio',
+			nombre: 'Préstamos',
+			descripcion: 'Quién debe qué a quién',
+			badge: null
+		},
+		{
+			ruta: '/apartados/deseos',
+			icono: 'regalo',
+			nombre: 'Deseos',
+			descripcion: 'Antojos con 30 días de nevera',
+			badge: data.deseosListos > 0 ? data.deseosListos : null
+		},
+		{
 			ruta: '/apartados/ajustes',
 			icono: 'ajustes',
 			nombre: 'Ajustes',
-			descripcion: 'Tema, contraseña, privacidad',
+			descripcion: 'Tema, avisos, contraseña, privacidad',
 			badge: null
 		}
 	]);
@@ -51,8 +86,7 @@
 		{/each}
 	</div>
 	<p class="texto-suave texto-pequeno nota-crecimiento">
-		Esta rejilla crece contigo: los módulos de dinero, cine y avisos llegan según los vayas
-		necesitando.
+		El perfil vivo y los informes de la IA llegan en la siguiente fase.
 	</p>
 </main>
 

@@ -2,13 +2,24 @@ import { fail, redirect } from '@sveltejs/kit';
 import { cambiarContrasena, cerrarSesion, verificarCredenciales } from '$lib/server/auth';
 import { configIA, guardarConfig } from '$lib/server/config';
 import { proveedorConfigurado } from '$lib/server/ia';
+import {
+	clavePublicaVapid,
+	contarSuscripciones,
+	enviarPushAlUsuario,
+	pushConfigurado
+} from '$lib/server/push';
 import { TIPOS } from '$lib/tipos';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	return {
 		ia: await configIA(locals.usuario!.id),
-		proveedor: proveedorConfigurado()
+		proveedor: proveedorConfigurado(),
+		push: {
+			configurado: pushConfigurado(),
+			clavePublica: clavePublicaVapid(),
+			dispositivos: await contarSuscripciones(locals.usuario!.id)
+		}
 	};
 };
 
@@ -23,6 +34,28 @@ export const actions: Actions = {
 
 		await guardarConfig(locals.usuario!.id, 'ia', { activa, tiposOcultos });
 		return { seccion: 'ia', hecho: 'Preferencias de IA guardadas.' };
+	},
+
+	probarAviso: async ({ locals }) => {
+		if (!pushConfigurado()) {
+			return fail(400, {
+				seccion: 'push',
+				error: 'Faltan las claves VAPID en .env — genéralas con «npm run generar-vapid».'
+			});
+		}
+		const enviados = await enviarPushAlUsuario(locals.usuario!.id, {
+			titulo: 'Probando, probando…',
+			cuerpo: 'Los avisos de BIZIYE llegan bien a este dispositivo.',
+			url: '/',
+			etiqueta: 'prueba'
+		});
+		if (enviados === 0) {
+			return fail(400, {
+				seccion: 'push',
+				error: 'No hay ningún dispositivo suscrito todavía. Activa los avisos primero.'
+			});
+		}
+		return { seccion: 'push', hecho: `Aviso enviado a ${enviados} dispositivo(s).` };
 	},
 
 	contrasena: async ({ request, locals }) => {

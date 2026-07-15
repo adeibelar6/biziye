@@ -33,6 +33,93 @@
 			document.documentElement.dataset.theme = nuevo;
 		}
 	}
+
+	// ── Notificaciones push ──────────────────────────────────────────────────
+	let dispositivos = $state(0);
+	let esteDispositivo = $state(false);
+	let ocupadoPush = $state(false);
+	$effect(() => {
+		dispositivos = data.push.dispositivos;
+	});
+
+	async function registroSW(): Promise<ServiceWorkerRegistration | null> {
+		if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
+		return (await navigator.serviceWorker.getRegistration()) ?? null;
+	}
+
+	// El pushManager quiere la clave VAPID como Uint8Array, no en base64url.
+	function claveComoBytes(base64url: string): Uint8Array<ArrayBuffer> {
+		const base64 = (base64url + '='.repeat((4 - (base64url.length % 4)) % 4))
+			.replace(/-/g, '+')
+			.replace(/_/g, '/');
+		const crudo = atob(base64);
+		const bytes = new Uint8Array(new ArrayBuffer(crudo.length));
+		for (let i = 0; i < crudo.length; i++) bytes[i] = crudo.charCodeAt(i);
+		return bytes;
+	}
+
+	$effect(() => {
+		void (async () => {
+			const registro = await registroSW();
+			esteDispositivo = Boolean(await registro?.pushManager.getSubscription());
+		})();
+	});
+
+	async function activarAvisos() {
+		if (!data.push.clavePublica) return;
+		ocupadoPush = true;
+		try {
+			const registro = await registroSW();
+			if (!registro) {
+				avisar('Aquí no hay service worker: prueba desde la app instalada (o npm run preview).');
+				return;
+			}
+			if ((await Notification.requestPermission()) !== 'granted') {
+				avisar('Sin permiso de notificaciones no hay avisos. Se cambia en el navegador.');
+				return;
+			}
+			const suscripcion = await registro.pushManager.subscribe({
+				userVisibleOnly: true,
+				applicationServerKey: claveComoBytes(data.push.clavePublica)
+			});
+			const respuesta = await fetch('/api/push', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ suscripcion: suscripcion.toJSON() })
+			});
+			const datos = await respuesta.json();
+			if (respuesta.ok) {
+				dispositivos = datos.dispositivos;
+				esteDispositivo = true;
+				avisar('Avisos activados en este dispositivo.');
+			} else {
+				avisar(datos.error ?? 'No se pudo guardar la suscripción.');
+			}
+		} finally {
+			ocupadoPush = false;
+		}
+	}
+
+	async function desactivarAvisos() {
+		ocupadoPush = true;
+		try {
+			const registro = await registroSW();
+			const suscripcion = await registro?.pushManager.getSubscription();
+			if (suscripcion) {
+				await fetch('/api/push', {
+					method: 'DELETE',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ endpoint: suscripcion.endpoint })
+				});
+				await suscripcion.unsubscribe();
+				dispositivos = Math.max(0, dispositivos - 1);
+			}
+			esteDispositivo = false;
+			avisar('Avisos desactivados en este dispositivo.');
+		} finally {
+			ocupadoPush = false;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -131,6 +218,50 @@
 
 			<button class="boton boton--suave">Guardar preferencias de IA</button>
 		</form>
+	</section>
+
+	<section class="tarjeta">
+		<h2 class="titulo-seccion">Notificaciones</h2>
+		{#if !data.push.configurado}
+			<p class="texto-suave texto-pequeno explicacion">
+				Faltan las claves VAPID: ejecuta <code>npm run generar-vapid</code> y reinicia la app.
+				Mientras tanto, los avisos del motor de recordatorios se quedan en el log del servidor.
+			</p>
+		{:else}
+			<p class="texto-suave texto-pequeno explicacion">
+				Renovaciones, vencimientos, tareas con fecha, deseos que terminan de enfriarse… llegan
+				como notificación. {dispositivos === 0
+					? 'Ningún dispositivo suscrito aún.'
+					: `Dispositivos suscritos: ${dispositivos}.`}
+			</p>
+			<div class="fila acciones-push">
+				{#if esteDispositivo}
+					<button class="boton boton--suave" onclick={desactivarAvisos} disabled={ocupadoPush}>
+						Desactivar en este dispositivo
+					</button>
+				{:else}
+					<button class="boton boton--primario" onclick={activarAvisos} disabled={ocupadoPush}>
+						<Icono nombre="campana" tamano={17} grosor={2} />
+						Activar avisos aquí
+					</button>
+				{/if}
+				<form
+					method="POST"
+					action="?/probarAviso"
+					use:enhance={() => {
+						return async ({ update, result }) => {
+							await update({ reset: false });
+							if (result.type === 'success') avisar('Aviso de prueba enviado.');
+						};
+					}}
+				>
+					<button class="boton boton--fantasma" disabled={dispositivos === 0}>Probar aviso</button>
+				</form>
+			</div>
+			{#if form?.seccion === 'push' && form?.error}
+				<p class="error" role="alert">{form.error}</p>
+			{/if}
+		{/if}
 	</section>
 
 	<section class="tarjeta">
@@ -268,6 +399,10 @@
 		height: 20px;
 		accent-color: var(--acento);
 		flex-shrink: 0;
+	}
+
+	.acciones-push {
+		flex-wrap: wrap;
 	}
 
 	.campo {
