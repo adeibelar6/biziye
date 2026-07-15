@@ -158,6 +158,16 @@
 		</section>
 	{/if}
 
+	{#if data.ofrecerCierre}
+		<a class="tarjeta cierre-cta aparece" href="/cierre">
+			<span class="cierre-texto">
+				<strong>Cierra el día</strong>
+				<small>Dos o tres preguntas según lo que ha pasado hoy. Dos minutos.</small>
+			</span>
+			<Icono nombre="flecha-derecha" tamano={20} grosor={2.2} />
+		</a>
+	{/if}
+
 	{#if data.pildora}
 		<section class="tarjeta pildora aparece">
 			<p class="pildora-titulo">
@@ -275,6 +285,33 @@
 		color: inherit;
 		flex: 1;
 		padding: 0.5rem 0;
+	}
+
+	.cierre-cta {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		text-decoration: none;
+		color: var(--acento-contraste);
+		background: var(--acento);
+		border-color: var(--acento);
+	}
+
+	.cierre-cta:hover {
+		text-decoration: none;
+		background: var(--acento-fuerte);
+	}
+
+	.cierre-texto {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+
+	.cierre-texto small {
+		opacity: 0.85;
+		font-size: 0.82rem;
 	}
 
 	.pildora {

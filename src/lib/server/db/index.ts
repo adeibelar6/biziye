@@ -49,6 +49,8 @@ export async function inicializarBD(): Promise<BD> {
 
 /** Acceso a la BD ya inicializada (hooks.server.ts la inicializa al arrancar). */
 export function bd(): BD {
+	// Los tests registran su BD en globalThis después de cargar este módulo.
+	instancia ??= almacenGlobal.__biziyeBD;
 	if (!instancia) {
 		throw new Error('La base de datos no está inicializada todavía.');
 	}

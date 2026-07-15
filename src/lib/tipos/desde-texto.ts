@@ -15,13 +15,13 @@ export function extraerImporte(texto: string): number | undefined {
 }
 
 const CATEGORIAS_GASTO: [RegExp, string][] = [
-	[/\b(comid|cen|comer|restaurante|bar|caf[eé]|desayun|pizz|men[uú]|super|mercadona|compra)\w*/i, 'comida'],
-	[/\b(luz|agua|gas|alquiler|hipoteca|internet|m[oó]vil|casa|mueble|ikea)\w*/i, 'casa'],
-	[/\b(gasolin|diesel|parking|peaje|tren|bus|metro|taxi|uber|coche|itv|taller)\w*/i, 'transporte'],
-	[/\b(cine|concierto|entrada|juego|ocio|cervez|copa|caña|fiesta|viaje|hotel)\w*/i, 'ocio'],
-	[/\b(m[eé]dic|farmaci|dentista|fisio|gimnasio|gym)\w*/i, 'salud'],
-	[/\b(ropa|zapat|camisa|pantal[oó]n|abrigo)\w*/i, 'ropa'],
-	[/\b(regalo|cumple)\w*/i, 'regalos']
+	[/\b(gasolin|diesel|parking|peaje|tren\b|bus\b|metro|taxi|uber|coche|itv\b|taller)/i, 'transporte'],
+	[/\b(comid|cen[aá]|comer|restaurante|bar\b|bares\b|caf[eé]|desayun|pizz|men[uú]|super|mercadona|compra)/i, 'comida'],
+	[/\b(luz\b|agua\b|gas\b|alquiler|hipoteca|internet|m[oó]vil|casa\b|mueble|ikea)/i, 'casa'],
+	[/\b(cine\b|concierto|entrada|juego|ocio|cervez|copa|caña|fiesta|viaje|hotel)/i, 'ocio'],
+	[/\b(m[eé]dic|farmaci|dentista|fisio|gimnasio|gym\b)/i, 'salud'],
+	[/\b(ropa\b|zapat|camisa|pantal[oó]n|abrigo)/i, 'ropa'],
+	[/\b(regalo|cumple)/i, 'regalos']
 ];
 
 export function categoriaGasto(texto: string): string {

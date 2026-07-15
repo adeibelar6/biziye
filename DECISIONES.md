@@ -71,6 +71,41 @@ dentro de OneDrive, cuya sincronización bloquea archivos. Solución doble:
 (`<dir>.lock`) hace que el segundo proceso falle con un mensaje claro en vez
 de corromper nada. Los candados huérfanos de procesos muertos se retiran solos.
 
+## Fase 2 — IA
+
+**El filtro de privacidad vive en la capa de datos, con tests contra BD real.**
+`entradasParaIA()` (src/lib/server/ia/datos.ts) es la única puerta por la que
+la IA lee entradas: fuerza `visible_ia = true` en el SQL y excluye los tipos
+ocultos de Ajustes. Chat, herramientas, cierres e informes leen solo de ahí.
+Los tests de `privacidad.test.ts` lo demuestran contra PGlite en memoria con
+las migraciones reales — no contra mocks.
+
+**La clasificación envía al proveedor únicamente el texto recién capturado.**
+Es inherente a «con IA activa clasifica sola»: ese texto aún no es una entrada
+y no tiene interruptor. Quien no quiera que un texto viaje puede elegir tipo a
+mano (no se clasifica), apagar la IA entera, o marcar el apartado como oculto
+— en ese caso la entrada resultante nace además con `visible_ia = false`.
+
+**El puente (bridge) habla protocolo OpenAI contra una URL configurable.**
+No se reimplementa la autenticación de la suscripción de ChatGPT (cambia sin
+aviso y se rompería en silencio): `IA_PROVEEDOR=bridge` + `BRIDGE_URL` apuntan
+a cualquier proxy OpenAI-compatible (OpenClaw, LiteLLM…) que use tu
+suscripción por detrás. Mismo adaptador que `openai`, otra URL y otro token.
+Detalle y opciones concretas en docs/bridge.md.
+
+**OpenAI sin SDK: fetch al protocolo /chat/completions.**
+Menos dependencias, control total del bucle de function calling (máx. 5
+vueltas de herramientas) y el mismo código sirve para el puente.
+
+**Umbral de confianza 0,6 y el inbox como red.**
+Clasificación con confianza < 0,6, payload inválido o proveedor caído →
+sin_clasificar al inbox. La captura JAMÁS se pierde por culpa de la IA.
+
+**El cierre del día se guarda como nota con etiqueta `cierre`.**
+No hace falta un tipo nuevo ni una tabla: es una entrada más (buscable en el
+timeline), y la etiqueta permite saber si hoy ya se cerró. Se ofrece en Hoy a
+partir de las 19:00 si la IA está activa.
+
 **Cron interno con registro de evaluadores.**
 Un `setInterval` por minuto dentro del propio proceso Node (no cron del sistema)
 con una lista de evaluadores idempotentes. Suficiente para un solo usuario,

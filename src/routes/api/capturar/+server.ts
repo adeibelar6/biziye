@@ -1,6 +1,8 @@
 import { json } from '@sveltejs/kit';
+import { configIA } from '$lib/server/config';
 import { crearEntrada } from '$lib/server/entradas';
-import { TIPOS } from '$lib/tipos';
+import { clasificarCaptura } from '$lib/server/ia/clasificar';
+import { TIPOS, definicion } from '$lib/tipos';
 import { payloadDesdeTexto } from '$lib/tipos/desde-texto';
 import type { RequestHandler } from './$types';
 
@@ -26,6 +28,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const idCliente = typeof cuerpo.idCliente === 'string' ? cuerpo.idCliente : undefined;
 	const tipoManual = typeof cuerpo.tipo === 'string' && TIPOS.has(cuerpo.tipo) ? cuerpo.tipo : null;
 
+	const config = await configIA(usuario.id);
+	const visibleSegunTipo = (tipo: string) =>
+		definicion(tipo).visibleIaPorDefecto && !config.tiposOcultos.includes(tipo);
+
 	if (tipoManual) {
 		const payload = payloadDesdeTexto(tipoManual, texto);
 		if (payload) {
@@ -33,7 +39,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				id: idCliente,
 				tipo: tipoManual,
 				payload,
-				timestamp
+				timestamp,
+				visibleIa: visibleSegunTipo(tipoManual)
 			});
 			return json({ entrada, destino: 'directa' }, { status: 201 });
 		}
@@ -46,6 +53,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			timestamp
 		});
 		return json({ entrada, destino: 'inbox' }, { status: 201 });
+	}
+
+	// Sin tipo elegido: que decida la IA (si está encendida y se atreve).
+	const clasificado = await clasificarCaptura(usuario.id, texto);
+	if (clasificado) {
+		const entrada = await crearEntrada(usuario.id, {
+			id: idCliente,
+			tipo: clasificado.tipo,
+			payload: clasificado.payload,
+			tags: clasificado.tags,
+			timestamp,
+			visibleIa: visibleSegunTipo(clasificado.tipo)
+		});
+		return json({ entrada, destino: 'clasificada' }, { status: 201 });
 	}
 
 	const entrada = await crearEntrada(usuario.id, {

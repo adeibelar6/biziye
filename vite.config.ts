@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { sveltekit } from '@sveltejs/kit/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -71,6 +72,15 @@ export default defineConfig({
 	],
 	test: {
 		include: ['src/**/*.test.ts'],
-		environment: 'node'
+		environment: 'node',
+		alias: {
+			// Los módulos virtuales de SvelteKit no existen bajo vitest puro.
+			'$env/dynamic/private': fileURLToPath(
+				new URL('./src/pruebas/env-stub.ts', import.meta.url)
+			),
+			'$app/environment': fileURLToPath(
+				new URL('./src/pruebas/app-environment-stub.ts', import.meta.url)
+			)
+		}
 	}
 });

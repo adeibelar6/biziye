@@ -1,12 +1,30 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { cambiarContrasena, cerrarSesion, verificarCredenciales } from '$lib/server/auth';
+import { configIA, guardarConfig } from '$lib/server/config';
+import { proveedorConfigurado } from '$lib/server/ia';
+import { TIPOS } from '$lib/tipos';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
-	return {};
+export const load: PageServerLoad = async ({ locals }) => {
+	return {
+		ia: await configIA(locals.usuario!.id),
+		proveedor: proveedorConfigurado()
+	};
 };
 
 export const actions: Actions = {
+	ia: async ({ request, locals }) => {
+		const datos = await request.formData();
+		const activa = datos.has('activa');
+		const tiposOcultos = datos
+			.getAll('oculto')
+			.map(String)
+			.filter((t) => TIPOS.has(t));
+
+		await guardarConfig(locals.usuario!.id, 'ia', { activa, tiposOcultos });
+		return { seccion: 'ia', hecho: 'Preferencias de IA guardadas.' };
+	},
+
 	contrasena: async ({ request, locals }) => {
 		const datos = await request.formData();
 		const actual = String(datos.get('actual') ?? '');
