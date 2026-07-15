@@ -1,0 +1,69 @@
+# Producción (VPS Hetzner): app + PostgreSQL + Caddy (HTTPS) + backups diarios.
+# Config: copia .env.prod.example a .env.prod y rellénalo. Luego:
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env.prod
+    environment:
+      DATABASE_URL: postgres://biziye:${DB_PASSWORD}@db:5432/biziye
+      COOKIE_SEGURA: 'true'
+      ORIGIN: https://${DOMINIO}
+      TZ: Europe/Madrid
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - '3000'
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: biziye
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: biziye
+      TZ: Europe/Madrid
+    volumes:
+      - biziye_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U biziye -d biziye']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      DOMINIO: ${DOMINIO}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - biziye_caddy_datos:/data
+      - biziye_caddy_config:/config
+    depends_on:
+      - app
+
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      PGPASSWORD: ${DB_PASSWORD}
+      DIAS_RETENCION: ${BACKUP_DIAS_RETENCION:-30}
+      TZ: Europe/Madrid
+    volumes:
+      - ./backups:/backups
+      - ./deploy/backup.sh:/backup.sh:ro
+    entrypoint: ['sh', '/backup.sh']
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  biziye_db:
+  biziye_caddy_datos:
+  biziye_caddy_config:

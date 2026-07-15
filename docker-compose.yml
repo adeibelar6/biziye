@@ -1,0 +1,18 @@
+# Dev: solo la base de datos. La app corre con `npm run dev`.
+# Si no tienes Docker, no pasa nada: sin DATABASE_URL la app usa PGlite
+# (PostgreSQL embebido en ./data/pglite) y funciona igual.
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: biziye
+      POSTGRES_PASSWORD: biziye
+      POSTGRES_DB: biziye
+    ports:
+      - '5432:5432'
+    volumes:
+      - biziye_db_dev:/var/lib/postgresql/data
+
+volumes:
+  biziye_db_dev:

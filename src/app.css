@@ -1,0 +1,423 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   BIZIYE — sistema de diseño
+   Identidad: «bizi» (vivir). Verde monte + papel txakoli + rojo amapola.
+   Display: Bricolage Grotesque. Cuerpo: pila del sistema.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+	/* Color — modo día */
+	--fondo: #efefe4;
+	--superficie: #f8f7ee;
+	--superficie-2: #e6e7d7;
+	--linea: #d6d8c4;
+	--tinta: #20281f;
+	--tinta-2: #59634f;
+	--tinta-3: #8b927d;
+	--acento: #cf4426;
+	--acento-fuerte: #b83a20;
+	--acento-contraste: #fff6ee;
+	--acento-suave: #f3ddd2;
+	--verde: #33593b;
+	--verde-contraste: #f2f5ea;
+	--verde-suave: #dfe6d0;
+	--exito: #3a7a46;
+	--aviso: #93700f;
+	--peligro: #b83a20;
+	--sombra: 0 1px 2px rgb(32 40 31 / 0.06), 0 4px 16px rgb(32 40 31 / 0.07);
+	--sombra-alta: 0 2px 6px rgb(32 40 31 / 0.12), 0 12px 32px rgb(32 40 31 / 0.18);
+
+	/* Tipografía */
+	--fuente-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+	--fuente-cuerpo: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+	/* Geometría */
+	--radio-s: 10px;
+	--radio: 16px;
+	--radio-chip: 999px;
+	--barra-inferior: 76px;
+
+	color-scheme: light;
+}
+
+[data-theme='oscuro'] {
+	--fondo: #141a15;
+	--superficie: #1d251e;
+	--superficie-2: #27312a;
+	--linea: #333f35;
+	--tinta: #edecdd;
+	--tinta-2: #a8b19d;
+	--tinta-3: #78816c;
+	--acento: #ef5b3a;
+	--acento-fuerte: #ff6f4d;
+	--acento-contraste: #1d1109;
+	--acento-suave: #45241b;
+	--verde: #8fbc94;
+	--verde-contraste: #14241a;
+	--verde-suave: #24342a;
+	--exito: #7cc088;
+	--aviso: #e0b23e;
+	--peligro: #ec6a52;
+	--sombra: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.35);
+	--sombra-alta: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.5);
+	color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='claro']):not([data-theme='oscuro']) {
+		--fondo: #141a15;
+		--superficie: #1d251e;
+		--superficie-2: #27312a;
+		--linea: #333f35;
+		--tinta: #edecdd;
+		--tinta-2: #a8b19d;
+		--tinta-3: #78816c;
+		--acento: #ef5b3a;
+		--acento-fuerte: #ff6f4d;
+		--acento-contraste: #1d1109;
+		--acento-suave: #45241b;
+		--verde: #8fbc94;
+		--verde-contraste: #14241a;
+		--verde-suave: #24342a;
+		--exito: #7cc088;
+		--aviso: #e0b23e;
+		--peligro: #ec6a52;
+		--sombra: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.35);
+		--sombra-alta: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.5);
+		color-scheme: dark;
+	}
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--fondo);
+	color: var(--tinta);
+	font-family: var(--fuente-cuerpo);
+	font-size: 1rem;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	min-height: 100dvh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--fuente-display);
+	line-height: 1.15;
+	margin: 0 0 0.5rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	text-wrap: balance;
+}
+
+p {
+	margin: 0 0 0.75rem;
+}
+
+a {
+	color: var(--acento);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+button {
+	font: inherit;
+	color: inherit;
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+}
+
+:focus-visible {
+	outline: 2px solid var(--acento);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+::placeholder {
+	color: var(--tinta-3);
+	opacity: 1;
+}
+
+/* ── Componentes base ──────────────────────────────────────────────────── */
+
+.pagina {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 1rem 1rem calc(var(--barra-inferior) + 2rem);
+}
+
+@media (min-width: 900px) {
+	.pagina {
+		padding-top: 2rem;
+	}
+}
+
+.titulo-pagina {
+	font-size: 1.9rem;
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	margin-bottom: 1rem;
+}
+
+.tarjeta {
+	background: var(--superficie);
+	border: 1px solid var(--linea);
+	border-radius: var(--radio);
+	padding: 1rem;
+	box-shadow: var(--sombra);
+}
+
+.boton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	min-height: 44px;
+	padding: 0.6rem 1.2rem;
+	border-radius: var(--radio-chip);
+	font-weight: 600;
+	font-size: 0.95rem;
+	background: var(--tinta);
+	color: var(--fondo);
+	transition:
+		transform 120ms ease,
+		opacity 120ms ease,
+		background-color 120ms ease;
+	user-select: none;
+}
+
+.boton:active {
+	transform: scale(0.97);
+}
+
+.boton:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.boton--primario {
+	background: var(--acento);
+	color: var(--acento-contraste);
+}
+
+.boton--primario:hover {
+	background: var(--acento-fuerte);
+}
+
+.boton--suave {
+	background: var(--superficie-2);
+	color: var(--tinta);
+}
+
+.boton--fantasma {
+	background: transparent;
+	color: var(--tinta-2);
+	border: 1px solid var(--linea);
+}
+
+.boton--peligro {
+	background: transparent;
+	color: var(--peligro);
+	border: 1px solid var(--peligro);
+}
+
+.boton--bloque {
+	width: 100%;
+}
+
+.campo {
+	display: block;
+	width: 100%;
+	min-height: 44px;
+	padding: 0.65rem 0.9rem;
+	border: 1.5px solid var(--linea);
+	border-radius: var(--radio-s);
+	background: var(--superficie);
+	color: var(--tinta);
+	font: inherit;
+	transition: border-color 120ms ease;
+}
+
+.campo:focus {
+	outline: none;
+	border-color: var(--acento);
+}
+
+textarea.campo {
+	resize: vertical;
+	line-height: 1.45;
+}
+
+.etiqueta {
+	display: block;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--tinta-2);
+	margin: 0 0 0.3rem 0.1rem;
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.28rem 0.75rem;
+	border-radius: var(--radio-chip);
+	background: var(--superficie-2);
+	color: var(--tinta-2);
+	font-size: 0.82rem;
+	font-weight: 600;
+	border: 1px solid transparent;
+	transition:
+		background-color 120ms ease,
+		color 120ms ease,
+		border-color 120ms ease;
+}
+
+button.chip {
+	min-height: 36px;
+}
+
+.chip--activo {
+	background: var(--tinta);
+	color: var(--fondo);
+}
+
+.chip--acento {
+	background: var(--acento-suave);
+	color: var(--acento-fuerte);
+}
+
+[data-theme='oscuro'] .chip--acento {
+	color: #ffb39e;
+}
+
+/* ── Estado vacío: cada pantalla enseña a usarse ───────────────────────── */
+
+.estado-vacio {
+	text-align: center;
+	padding: 2.5rem 1.5rem;
+	color: var(--tinta-2);
+}
+
+.estado-vacio__icono {
+	font-size: 2.2rem;
+	margin-bottom: 0.6rem;
+}
+
+.estado-vacio h3 {
+	color: var(--tinta);
+	font-size: 1.2rem;
+}
+
+.estado-vacio p {
+	max-width: 34ch;
+	margin-inline: auto;
+	font-size: 0.95rem;
+}
+
+/* ── Esqueletos de carga ───────────────────────────────────────────────── */
+
+.esqueleto {
+	border-radius: var(--radio-s);
+	background: linear-gradient(
+		100deg,
+		var(--superficie-2) 40%,
+		var(--superficie) 50%,
+		var(--superficie-2) 60%
+	);
+	background-size: 200% 100%;
+	animation: esqueleto-brillo 1.4s ease-in-out infinite;
+	color: transparent;
+	user-select: none;
+}
+
+@keyframes esqueleto-brillo {
+	from {
+		background-position: 120% 0;
+	}
+	to {
+		background-position: -80% 0;
+	}
+}
+
+/* ── Animación de entrada de tarjetas ──────────────────────────────────── */
+
+.aparece {
+	animation: aparecer 240ms ease-out both;
+}
+
+@keyframes aparecer {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/* ── Utilidades ────────────────────────────────────────────────────────── */
+
+.oculto-visualmente {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.texto-suave {
+	color: var(--tinta-2);
+}
+
+.texto-pequeno {
+	font-size: 0.85rem;
+}
+
+.fila {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.fila--separada {
+	justify-content: space-between;
+}
+
+.columna {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
