@@ -294,6 +294,19 @@
 	</section>
 
 	<section class="tarjeta">
+		<h2 class="titulo-seccion">Tus datos</h2>
+		<p class="texto-suave texto-pequeno explicacion">
+			Todo lo tuyo, en un JSON: entradas (también las borradas), perfil vivo, chat,
+			recordatorios y configuración. Los backups automáticos de la base de datos se hacen en el
+			servidor (ver README).
+		</p>
+		<a class="boton boton--suave" href="/api/exportar" download>
+			<Icono nombre="descarga" tamano={17} grosor={2} />
+			Descargar exportación completa
+		</a>
+	</section>
+
+	<section class="tarjeta">
 		<h2 class="titulo-seccion">Sesión</h2>
 		<form method="POST" action="?/salir" use:enhance>
 			<button class="boton boton--fantasma">

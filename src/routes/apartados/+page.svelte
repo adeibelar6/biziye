@@ -54,6 +54,20 @@
 			badge: data.deseosListos > 0 ? data.deseosListos : null
 		},
 		{
+			ruta: '/apartados/perfil',
+			icono: 'usuario',
+			nombre: 'Perfil vivo',
+			descripcion: 'Lo que la IA sabe de ti, editable',
+			badge: null
+		},
+		{
+			ruta: '/apartados/informes',
+			icono: 'libro',
+			nombre: 'Informes',
+			descripcion: 'Revisión semanal e informe del mes',
+			badge: null
+		},
+		{
 			ruta: '/apartados/ajustes',
 			icono: 'ajustes',
 			nombre: 'Ajustes',
@@ -86,7 +100,8 @@
 		{/each}
 	</div>
 	<p class="texto-suave texto-pequeno nota-crecimiento">
-		El perfil vivo y los informes de la IA llegan en la siguiente fase.
+		¿Echas algo en falta? El modo crisis, la rueda de la vida y los dashboards vendrán cuando
+		hagan falta de verdad.
 	</p>
 </main>
 

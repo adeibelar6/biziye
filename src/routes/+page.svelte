@@ -134,6 +134,16 @@
 		</section>
 	{/if}
 
+	{#if data.briefing}
+		<section class="tarjeta briefing aparece">
+			<p class="briefing-titulo">
+				<Icono nombre="chispa" tamano={15} grosor={2} />
+				El día, según la IA
+			</p>
+			<p class="briefing-texto">{data.briefing}</p>
+		</section>
+	{/if}
+
 	{#if data.avisos.length > 0}
 		<section class="tarjeta aparece">
 			<h2 class="titulo-seccion">Avisos a la vista</h2>
@@ -263,6 +273,28 @@
 
 	.ver-todas {
 		color: var(--tinta-2);
+	}
+
+	.briefing {
+		background: var(--verde-suave);
+	}
+
+	.briefing-titulo {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.8rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--verde);
+		margin: 0 0 0.45rem;
+	}
+
+	.briefing-texto {
+		margin: 0;
+		font-size: 0.95rem;
+		white-space: pre-line;
 	}
 
 	.lista-avisos {

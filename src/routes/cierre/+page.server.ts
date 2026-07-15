@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { configIA } from '$lib/server/config';
 import { crearEntrada, listarEntradas } from '$lib/server/entradas';
 import { generarCierreDelDia } from '$lib/server/ia/generar';
+import { actualizarPerfilConIA } from '$lib/server/ia/perfil';
 import { definicion } from '$lib/tipos';
 import { diaLocal } from '$lib/fechas';
 import type { Actions, PageServerLoad } from './$types';
@@ -61,6 +62,12 @@ export const actions: Actions = {
 			tags: ['cierre'],
 			visibleIa: definicion('nota').visibleIaPorDefecto && !config.tiposOcultos.includes('nota')
 		});
+
+		// Tras cada análisis, la IA repasa el perfil vivo. Sin bloquear el
+		// cierre: si el proveedor tarda o falla, el perfil ya se pondrá al día.
+		actualizarPerfilConIA(locals.usuario!.id, 'cierre_dia').catch((error) =>
+			console.error('[perfil] No se pudo actualizar tras el cierre:', error)
+		);
 
 		redirect(303, '/cierre');
 	}

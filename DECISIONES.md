@@ -147,3 +147,41 @@ el humor negro a las 4 de la mañana no re-engancha a nadie.
 **El enfriamiento se respeta también en el servidor.**
 «Lo compro» sobre un deseo aún enfriándose devuelve error aunque alguien fuerce
 el formulario: los 30 días son la función, no una sugerencia de interfaz.
+
+## Fase 4 — La IA aprende
+
+**Los avisos del briefing se reconstruyen desde entradasParaIA, no desde la
+tabla de recordatorios.** La tabla espejo no distingue apartados ocultos; la
+puerta filtrada sí. Es algo de trabajo repetido a cambio de que la regla dura
+de privacidad tenga una sola excepción posible: ninguna.
+
+**Generaciones con caché en config.**
+El briefing se genera una vez por día natural; el informe de un mes cerrado se
+cachea para siempre y el del mes en curso como mucho una vez al día. Con el
+proveedor mock da igual, con la API real es dinero. La caché vive en la tabla
+`config` (`briefing`, `informe:YYYY-MM`), sin tablas nuevas.
+
+**El perfil vivo versiona siempre, nunca pisa.**
+Cada actualización (IA o edición manual) inserta versión n+1 en `perfil_vivo`
+con su motivo; el historial es navegable (`?v=N`). La IA lo repasa tras cada
+cierre del día — sin bloquear el guardado del cierre: si el proveedor tarda o
+falla, ya se pondrá al día — y a demanda desde el apartado. Si no hay nada
+nuevo desde la última versión, no fabrica versiones vacías.
+
+**Markdown con renderizador propio de 60 líneas.**
+Los generadores solo emiten títulos, listas y negritas; traer una librería de
+markdown entera para eso era pagar superficie de ataque (XSS incluido) por
+nada. Se escapa el HTML y se reconoce únicamente lo que producimos.
+
+**La revisión semanal se guarda como nota con etiqueta `revision`.**
+Mismo patrón que el cierre: sin tablas nuevas, buscable en el timeline, y la
+página de informes enseña cuándo fue la última.
+
+**La exportación JSON incluye lo borrado.**
+`/api/exportar` vuelca entradas (con `borrado_en`), perfil completo, chat,
+recordatorios y config. Es una copia de tus datos, no una vista de la app.
+
+**El seed siembra también el espejo de recordatorios.**
+Los datos de demostración incluyen avisos ya programados para que «Hoy»
+enseñe su sección de avisos desde el primer arranque, sin esperar a editar
+nada. Aplica las migraciones él mismo: funciona sobre una BD virgen.
