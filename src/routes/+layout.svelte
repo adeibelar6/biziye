@@ -4,6 +4,7 @@
 	import { dev } from '$app/environment';
 	import { onMount } from 'svelte';
 	import BarraInferior from '$lib/componentes/BarraInferior.svelte';
+	import Avisos from '$lib/componentes/Avisos.svelte';
 	import { sincronizarCola } from '$lib/cliente/cola-offline';
 
 	let { children, data } = $props();
@@ -30,6 +31,8 @@
 </svelte:head>
 
 {@render children()}
+
+<Avisos />
 
 {#if data.usuario}
 	<BarraInferior />

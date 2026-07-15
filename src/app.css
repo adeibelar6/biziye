@@ -26,6 +26,20 @@
 	--sombra: 0 1px 2px rgb(32 40 31 / 0.06), 0 4px 16px rgb(32 40 31 / 0.07);
 	--sombra-alta: 0 2px 6px rgb(32 40 31 / 0.12), 0 12px 32px rgb(32 40 31 / 0.18);
 
+	/* Tonos de los sellos de tipo */
+	--tono-verde-fondo: #dbe7d3;
+	--tono-verde-tinta: #2e5335;
+	--tono-amapola-fondo: #f6dcd0;
+	--tono-amapola-tinta: #b03a1e;
+	--tono-mostaza-fondo: #f0e4c0;
+	--tono-mostaza-tinta: #7d5f0c;
+	--tono-arcilla-fondo: #ecdfd2;
+	--tono-arcilla-tinta: #7c4f2c;
+	--tono-ciruela-fondo: #e8dbe4;
+	--tono-ciruela-tinta: #6d3a5d;
+	--tono-mar-fondo: #d5e4e0;
+	--tono-mar-tinta: #23555c;
+
 	/* Tipografía */
 	--fuente-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
 	--fuente-cuerpo: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -59,6 +73,18 @@
 	--peligro: #ec6a52;
 	--sombra: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.35);
 	--sombra-alta: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.5);
+	--tono-verde-fondo: #24341f;
+	--tono-verde-tinta: #a4cc9c;
+	--tono-amapola-fondo: #442218;
+	--tono-amapola-tinta: #f29b82;
+	--tono-mostaza-fondo: #3d3313;
+	--tono-mostaza-tinta: #dcc064;
+	--tono-arcilla-fondo: #3b2b1d;
+	--tono-arcilla-tinta: #d8ab7f;
+	--tono-ciruela-fondo: #382030;
+	--tono-ciruela-tinta: #d49cc0;
+	--tono-mar-fondo: #1c3336;
+	--tono-mar-tinta: #8ec4c0;
 	color-scheme: dark;
 }
 
@@ -83,6 +109,18 @@
 		--peligro: #ec6a52;
 		--sombra: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.35);
 		--sombra-alta: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.5);
+		--tono-verde-fondo: #24341f;
+		--tono-verde-tinta: #a4cc9c;
+		--tono-amapola-fondo: #442218;
+		--tono-amapola-tinta: #f29b82;
+		--tono-mostaza-fondo: #3d3313;
+		--tono-mostaza-tinta: #dcc064;
+		--tono-arcilla-fondo: #3b2b1d;
+		--tono-arcilla-tinta: #d8ab7f;
+		--tono-ciruela-fondo: #382030;
+		--tono-ciruela-tinta: #d49cc0;
+		--tono-mar-fondo: #1c3336;
+		--tono-mar-tinta: #8ec4c0;
 		color-scheme: dark;
 	}
 }
@@ -306,6 +344,56 @@ button.chip {
 
 [data-theme='oscuro'] .chip--acento {
 	color: #ffb39e;
+}
+
+/* ── Sellos de tipo de entrada ─────────────────────────────────────────── */
+
+.sello {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.3rem;
+	width: 34px;
+	height: 34px;
+	border-radius: 11px;
+	flex-shrink: 0;
+	background: var(--sello-fondo, var(--superficie-2));
+	color: var(--sello-tinta, var(--tinta-2));
+}
+
+.sello--neutro {
+	--sello-fondo: var(--superficie-2);
+	--sello-tinta: var(--tinta-2);
+}
+
+.sello--verde {
+	--sello-fondo: var(--tono-verde-fondo);
+	--sello-tinta: var(--tono-verde-tinta);
+}
+
+.sello--amapola {
+	--sello-fondo: var(--tono-amapola-fondo);
+	--sello-tinta: var(--tono-amapola-tinta);
+}
+
+.sello--mostaza {
+	--sello-fondo: var(--tono-mostaza-fondo);
+	--sello-tinta: var(--tono-mostaza-tinta);
+}
+
+.sello--arcilla {
+	--sello-fondo: var(--tono-arcilla-fondo);
+	--sello-tinta: var(--tono-arcilla-tinta);
+}
+
+.sello--ciruela {
+	--sello-fondo: var(--tono-ciruela-fondo);
+	--sello-tinta: var(--tono-ciruela-tinta);
+}
+
+.sello--mar {
+	--sello-fondo: var(--tono-mar-fondo);
+	--sello-tinta: var(--tono-mar-tinta);
 }
 
 /* ── Estado vacío: cada pantalla enseña a usarse ───────────────────────── */
