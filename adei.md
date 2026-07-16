@@ -20,7 +20,11 @@ responde en un chat con acceso a los datos, guía el cierre del día y la
 revisión semanal, escribe el informe mensual y mantiene un **perfil vivo**
 sobre ti.
 
-## Estado: v1 completa (2026-07-15)
+## Estado: v1 en producción (2026-07-16)
+
+**La app está ON en https://biziye.fluxu.eus** — desplegada, con HTTPS,
+notificaciones configuradas e IA real por suscripción. Ver «En producción»
+más abajo.
 
 Construida por fases, un commit por fase, cada una verificada como usuario
 real contra la app en marcha antes de pasar a la siguiente:
@@ -35,6 +39,14 @@ real contra la app en marcha antes de pasar a la siguiente:
 
 **57 tests** en verde (vitest, contra PGlite real con las migraciones de
 producción, no contra mocks) y typecheck sin errores.
+
+Ajustes tras el estreno, pedidos usando la app de verdad (2026-07-16):
+
+| Commit | Contenido |
+|--------|-----------|
+| `47341ac` | Hoy: las métricas de un toque solo se ofrecen desde las 19:00, como el cierre — por la mañana estorbaban |
+| `3392825` | Cine: alta directa como vista (nota obligatoria y fecha, hoy por defecto), pestaña activa en la URL, filmoteca sin el tope de 100 |
+| `54fb9f1` | docs: el puente de IA desplegado (ChatMock) y cómo recuperarlo |
 
 ## Cómo está montado
 
@@ -80,14 +92,29 @@ Barra inferior fija: **Hoy · Timeline · [+] · Chat · Apartados**.
   deseos, perfil vivo, informes y ajustes (tema, notificaciones, privacidad,
   contraseña, exportación JSON).
 
+## En producción (2026-07-16)
+
+- **VPS Hetzner** (Ubuntu 24.04): Docker Compose en `/opt/biziye` con app +
+  PostgreSQL 17 + Caddy (HTTPS automático) + backup diario (`pg_dump` a las
+  3:00, retención 30 días). Cortafuegos ufw: solo SSH, 80 y 443.
+- **https://biziye.fluxu.eus** — DNS en Cloudflare en modo «solo DNS» (nube
+  gris; con el proxy naranja Caddy no puede emitir el certificado).
+- **Notificaciones**: claves VAPID generadas y en `.env.prod`.
+- **IA real por suscripción** (la vía principal de `biziye.md`): puente
+  **ChatMock** construido desde su código fuente en `/opt/chatmock`, con la
+  sesión de la cuenta ChatGPT/Codex del usuario; `IA_PROVEEDOR=bridge`,
+  modelo `gpt-5.5`. Solo accesible por la red interna de Docker — nunca
+  publicar su puerto (no tiene auth propia y Docker puentea ufw). Montaje y
+  recuperación en [`docs/bridge.md`](docs/bridge.md).
+
 ## Qué queda en manos del usuario
 
-1. `npm run generar-vapid` + reiniciar → notificaciones push reales.
-2. Elegir proveedor de IA real en `.env` (`openai` o `bridge`).
-3. Desplegar en el VPS (guía paso a paso en el README) y **ensayar allí la
-   restauración de un backup** (instrucción escrita, no ejecutada aún: en la
-   máquina de construcción no había Docker).
-4. Usarla una semana en el móvil real antes de pedirle más — regla del
+1. **Ensayar la restauración de un backup** en el VPS (instrucción escrita en
+   el README, aún no ejecutada de punta a punta) — mejor ahora que apenas hay
+   datos que perder.
+2. **Rotar las credenciales del VPS**: la contraseña de root se compartió por
+   chat durante el despliegue; el acceso por clave SSH ya está montado.
+3. Usarla una semana en el móvil real antes de pedirle más — regla del
    roadmap de `biziye.md`.
 
 Fuera de alcance v1 (a propósito): modo crisis, rueda de la vida, tipos
