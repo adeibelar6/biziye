@@ -33,6 +33,26 @@ detrás use tu suscripción, enchufa aquí sin tocar ni una línea de la app.
    u Ollama detrás del mismo enchufe.
 3. **Cualquier otro** que hable `/v1/chat/completions`.
 
+## El puente desplegado (2026-07-16): ChatMock en el VPS
+
+En producción el puente es **ChatMock** (github.com/RayBytes/ChatMock), construido
+desde su código fuente (no la imagen de Docker Hub) en `/opt/chatmock`:
+
+- `docker compose up -d chatmock` — expone `/v1/chat/completions` en el puerto
+  8000, **solo loopback y red interna** (`biziye_default`); Docker puentea ufw,
+  así que nunca publicar este puerto en 0.0.0.0 (la API no tiene auth propia).
+- Sesión: `docker compose run --rm --service-ports chatmock-login login`
+  (guarda los tokens en el volumen `chatmock_chatmock_data` y los refresca solo).
+  El callback OAuth va a `localhost:1455`; en remoto, pegar la URL de
+  redirección con `curl` contra `http://localhost:1455/auth/callback?...`.
+- En `/opt/biziye/.env.prod`: `IA_PROVEEDOR=bridge`,
+  `BRIDGE_URL=http://chatmock:8000/v1`, `OPENAI_MODELO=gpt-5.5`.
+- Ajustes de ChatMock en `/opt/chatmock/.env`
+  (`CHATGPT_LOCAL_REASONING_EFFORT=low` para respuestas ágiles).
+
+Si la IA deja de responder con 401: la sesión caducó de verdad — repetir el
+login de arriba.
+
 ## Si el puente se rompe (plan B de biziye.md)
 
 Cambia dos líneas del `.env` y reinicia:
