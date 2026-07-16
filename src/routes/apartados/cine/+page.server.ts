@@ -14,7 +14,8 @@ import { diaLocal } from '$lib/fechas';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const entradas = await listarEntradas(locals.usuario!.id, { tipo: 'pelicula', limite: 100 });
+	// La filmoteca entera: el ranking y las estadísticas se calculan sobre todo lo visto.
+	const entradas = await listarEntradas(locals.usuario!.id, { tipo: 'pelicula', limite: 1000 });
 	const titulos: Titulo[] = entradas.map((e) => ({
 		id: e.id,
 		payload: e.payload as Payload,
@@ -52,10 +53,12 @@ export const actions: Actions = {
 		const resultado = validarPayload('pelicula', bruto);
 		if (!resultado.valido) return fail(400, { error: resultado.error });
 
-		await crearEntrada(locals.usuario!.id, {
-			tipo: 'pelicula',
-			payload: { estado: 'pendiente', formato: 'pelicula', ...resultado.payload }
-		});
+		const payload: Payload = { estado: 'pendiente', formato: 'pelicula', ...resultado.payload };
+		if (payload.estado === 'vista') {
+			if (payload.nota === undefined) return fail(400, { error: 'Ponle nota: del 1 al 10.' });
+			payload.vista_en ??= diaLocal();
+		}
+		await crearEntrada(locals.usuario!.id, { tipo: 'pelicula', payload });
 		return { hecho: true };
 	},
 

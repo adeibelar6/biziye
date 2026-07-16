@@ -60,7 +60,7 @@ function condiciones(userId: string, filtros: FiltrosEntradas): SQL[] {
 }
 
 export async function listarEntradas(userId: string, filtros: FiltrosEntradas = {}) {
-	const limite = Math.min(filtros.limite ?? 30, 100);
+	const limite = Math.min(filtros.limite ?? 30, 1000);
 	return bd()
 		.select()
 		.from(tablas.entradas)

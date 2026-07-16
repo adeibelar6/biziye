@@ -1,13 +1,20 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { replaceState } from '$app/navigation';
+	import { page } from '$app/state';
 	import Icono from '$lib/componentes/Icono.svelte';
-	import { fechaCorta } from '$lib/fechas';
+	import { diaLocal, fechaCorta } from '$lib/fechas';
 
 	let { data, form } = $props();
 
 	type Pestana = 'pendientes' | 'vistas' | 'ranking' | 'estadisticas';
-	let pestana = $state<Pestana>('pendientes');
+	const CLAVES_PESTANA = ['pendientes', 'vistas', 'ranking', 'estadisticas'];
+	const pestanaInicial = page.url.searchParams.get('p') ?? '';
+	let pestana = $state<Pestana>(
+		CLAVES_PESTANA.includes(pestanaInicial) ? (pestanaInicial as Pestana) : 'pendientes'
+	);
 	let mostrarAlta = $state(false);
+	let estadoAlta = $state<'pendiente' | 'vista'>('pendiente');
 	let puntuando = $state<string | null>(null);
 
 	const PESTANAS: { clave: Pestana; texto: string }[] = [
@@ -16,6 +23,17 @@
 		{ clave: 'ranking', texto: 'Ranking' },
 		{ clave: 'estadisticas', texto: 'Estadísticas' }
 	];
+
+	// La pestaña vive en la URL: recargar o volver atrás no te devuelve a «Pendientes».
+	function cambiarPestana(p: Pestana) {
+		pestana = p;
+		replaceState(`?p=${p}`, {});
+	}
+
+	function conmutarAlta() {
+		if (!mostrarAlta) estadoAlta = pestana === 'vistas' ? 'vista' : 'pendiente';
+		mostrarAlta = !mostrarAlta;
+	}
 
 	function titulo(p: Record<string, unknown>): string {
 		return String(p.titulo ?? '');
@@ -39,17 +57,17 @@
 			<button
 				class="chip"
 				class:chip--activo={pestana === p.clave}
-				onclick={() => (pestana = p.clave)}
+				onclick={() => cambiarPestana(p.clave)}
 			>
 				{p.texto}
 			</button>
 		{/each}
 	</nav>
 
-	{#if pestana === 'pendientes'}
-		<button class="boton boton--suave alta-conmutador" onclick={() => (mostrarAlta = !mostrarAlta)}>
+	{#if pestana === 'pendientes' || pestana === 'vistas'}
+		<button class="boton boton--suave alta-conmutador" onclick={conmutarAlta}>
 			<Icono nombre="mas" tamano={16} grosor={2.2} />
-			{mostrarAlta ? 'Cerrar' : 'Apuntar título'}
+			{mostrarAlta ? 'Cerrar' : pestana === 'vistas' ? 'Apuntar una vista' : 'Apuntar título'}
 		</button>
 
 		{#if mostrarAlta}
@@ -60,12 +78,60 @@
 				use:enhance={() => {
 					return async ({ update, result }) => {
 						await update();
-						if (result.type === 'success') mostrarAlta = false;
+						if (result.type === 'success') {
+							mostrarAlta = false;
+							// Si entró directa como vista, enséñala donde ha caído.
+							if (estadoAlta === 'vista' && pestana !== 'vistas') cambiarPestana('vistas');
+						}
 					};
 				}}
 			>
 				<label class="etiqueta" for="c-titulo">Título</label>
 				<input class="campo" id="c-titulo" name="titulo" required placeholder="Dune, The Wire…" />
+
+				<span class="etiqueta">Estado</span>
+				<input type="hidden" name="estado" value={estadoAlta} />
+				<div class="fila conmutador-estado" role="group" aria-label="Estado del título">
+					<button
+						type="button"
+						class="chip"
+						class:chip--activo={estadoAlta === 'pendiente'}
+						onclick={() => (estadoAlta = 'pendiente')}
+					>
+						Pendiente
+					</button>
+					<button
+						type="button"
+						class="chip"
+						class:chip--activo={estadoAlta === 'vista'}
+						onclick={() => (estadoAlta = 'vista')}
+					>
+						Ya la vi
+					</button>
+				</div>
+
+				{#if estadoAlta === 'vista'}
+					<div class="fila fila-campos">
+						<div>
+							<label class="etiqueta" for="c-nota">Tu nota (1-10)</label>
+							<input
+								class="campo"
+								id="c-nota"
+								name="nota"
+								type="number"
+								inputmode="numeric"
+								min="1"
+								max="10"
+								required
+								placeholder="8"
+							/>
+						</div>
+						<div>
+							<label class="etiqueta" for="c-vista-en">Vista el…</label>
+							<input class="campo" id="c-vista-en" name="vista_en" type="date" value={diaLocal()} />
+						</div>
+					</div>
+				{/if}
 
 				<div class="fila fila-campos">
 					<div>
@@ -88,17 +154,21 @@
 					</div>
 					<div>
 						<label class="etiqueta" for="c-anio">Año</label>
-						<input class="campo" id="c-anio" name="anio" type="number" placeholder="2024" />
+						<input class="campo" id="c-anio" name="anio" type="number" inputmode="numeric" placeholder="2024" />
 					</div>
 				</div>
 
 				{#if form?.error && !form?.id}
 					<p class="error" role="alert">{form.error}</p>
 				{/if}
-				<button class="boton boton--primario">A la lista</button>
+				<button class="boton boton--primario">
+					{estadoAlta === 'vista' ? 'A vistas, con nota' : 'A la lista'}
+				</button>
 			</form>
 		{/if}
+	{/if}
 
+	{#if pestana === 'pendientes'}
 		{#if data.pendientes.length === 0}
 			<section class="tarjeta estado-vacio aparece">
 				<div class="estado-vacio__icono" aria-hidden="true">🎬</div>
@@ -154,7 +224,10 @@
 			<section class="tarjeta estado-vacio aparece">
 				<div class="estado-vacio__icono" aria-hidden="true">👀</div>
 				<h3>Todavía nada visto</h3>
-				<p>Cuando termines algo, márcalo con su nota del 1 al 10 desde «Pendientes».</p>
+				<p>
+					Puntúa desde «Pendientes» lo que termines, o apunta aquí directamente algo que ya
+					viste, con su nota del 1 al 10.
+				</p>
 			</section>
 		{:else}
 			<section class="tarjeta lista aparece">
@@ -310,6 +383,11 @@
 	.fila-campos {
 		gap: 0.75rem;
 		align-items: flex-start;
+	}
+
+	.conmutador-estado {
+		gap: 0.4rem;
+		margin-bottom: 0.75rem;
 	}
 
 	.fila-campos > div {
