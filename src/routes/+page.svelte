@@ -88,7 +88,7 @@
 		</p>
 	</header>
 
-	{#if faltanMetricas}
+	{#if data.ofrecerMetricas && faltanMetricas}
 		<section class="tarjeta aparece">
 			<h2 class="titulo-seccion">¿Cómo va el día?</h2>
 			<div class="columna metricas">
@@ -124,7 +124,7 @@
 				{/if}
 			</div>
 		</section>
-	{:else}
+	{:else if data.ofrecerMetricas}
 		<section class="tarjeta metricas-hechas aparece">
 			<span class="fila">
 				<Icono nombre="check" tamano={17} grosor={2.4} />

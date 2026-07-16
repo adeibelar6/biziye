@@ -40,7 +40,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		inbox,
 		avisos,
 		briefing,
-		// El cierre se ofrece por la tarde-noche, si la IA está activa y aún no se hizo.
+		// Las métricas y el cierre se ofrecen por la tarde-noche; antes solo estorban.
+		ofrecerMetricas: hora >= 19,
 		ofrecerCierre: ia.activa && hora >= 19 && cierresHoy === 0
 	};
 };

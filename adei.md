@@ -69,8 +69,8 @@ producción, no contra mocks) y typecheck sin errores.
 Barra inferior fija: **Hoy · Timeline · [+] · Chat · Apartados**.
 
 - **Hoy**: saludo (Egun on / Arratsalde on / Gabon), briefing de la IA
-  (cacheado por día), avisos a la vista, métricas de un toque, tareas,
-  píldora del pasado y, desde las 19:00, el cierre del día.
+  (cacheado por día), avisos a la vista, tareas, píldora del pasado y, desde
+  las 19:00, las métricas de un toque y el cierre del día.
 - **[+]**: texto libre + micrófono; con IA activa clasifica sola, si duda cae
   al inbox. Nada se pierde nunca por culpa de la IA.
 - **Chat**: consultar («¿cuánto he gastado este mes?», «¿qué veo esta
