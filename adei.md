@@ -48,7 +48,7 @@ Ajustes tras el estreno, pedidos usando la app de verdad (2026-07-16):
 | `47341ac` | Hoy: las métricas de un toque solo se ofrecen desde las 19:00, como el cierre — por la mañana estorbaban |
 | `3392825` | Cine: alta directa como vista (nota obligatoria y fecha, hoy por defecto), pestaña activa en la URL, filmoteca sin el tope de 100 |
 | `54fb9f1` | docs: el puente de IA desplegado (ChatMock) y cómo recuperarlo |
-| — | Tipo **evento** (reunión, cita, quedada): «apunta que hoy tengo reunión de fluxu a las 21:00» ya no cae al inbox — el clasificador recibe la fecha y hora actuales para resolver «hoy / mañana / el viernes / a las 9», limpia las muletillas del dictado, y el evento crea su aviso (push la mañana del día y «Avisos a la vista» en Hoy). El mock también lo entiende (con extracción de fecha/hora en `desde-texto.ts`) |
+| `9824917` | Tipo **evento** (reunión, cita, quedada): «apunta que hoy tengo reunión de fluxu a las 21:00» ya no cae al inbox — el clasificador recibe la fecha y hora actuales para resolver «hoy / mañana / el viernes / a las 9», limpia las muletillas del dictado (y perdona erratas como «reuinion»), y el evento crea su aviso (push la mañana del día y «Avisos a la vista» en Hoy hasta que pasa). El mock también lo entiende: extracción de fechas relativas y horas en `desde-texto.ts`, compartida con la captura manual y el inbox. Nuevo control `hora` en formularios y `hookTimeout` de vitest a 60 s (crear la BD PGlite de prueba tarda >10 s cuando OneDrive rasca el disco). Verificado por HTTP con BD limpia y **desplegado en producción el mismo día** (`git pull` + `docker compose up -d --build` en el VPS) |
 
 ## Cómo está montado
 
