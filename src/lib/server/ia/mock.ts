@@ -6,7 +6,12 @@ import type {
 	ProveedorIA,
 	ResultadoChat
 } from './tipos';
-import { categoriaGasto, extraerImporte, payloadDesdeTexto } from '$lib/tipos/desde-texto';
+import {
+	categoriaGasto,
+	extraerEvento,
+	extraerImporte,
+	payloadDesdeTexto
+} from '$lib/tipos/desde-texto';
 
 /**
  * Proveedor mock: heurísticas deterministas, sin red y sin claves.
@@ -38,7 +43,8 @@ const REGLAS: Regla[] = [
 	{
 		tipo: 'frase',
 		confianza: 0.8,
-		patron: /^[«"“'].+[»"”']|frase de|me dijo:|\bcita\b/i,
+		// «cita de» (una cita de alguien); la cita-agenda es del tipo evento.
+		patron: /^[«"“'].+[»"”']|frase de|me dijo:|\bcita de\b/i,
 		construir: (t) => {
 			const conAutor = t.match(/[«"“](.+)[»"”]\s*[—-]?\s*(.+)?/);
 			if (conAutor) {
@@ -112,6 +118,15 @@ const REGLAS: Regla[] = [
 		confianza: 0.8,
 		patron:
 			/consegu[ií]|logr[eé]|me ha salido (bien|genial)|por fin (he|pude|termin)|orgullos[oa]|lo bord[eé]|sal[ií]o redondo/i
+	},
+	{
+		tipo: 'evento',
+		confianza: 0.85,
+		// Después de fallo/logro: «la he liado en la reunión» no es agenda.
+		// «reu[ni]+[oó]n» perdona el baile de letras al teclear («reuinion»).
+		patron:
+			/\b(reu[ni]+[oó]n|cita|quedada|entrevista|m[eé]dic[oa]|dentista|fisio|evento)\b|he quedado|quedo con/i,
+		construir: (texto) => extraerEvento(texto)
 	},
 	{
 		tipo: 'deseo',

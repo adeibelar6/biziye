@@ -13,6 +13,7 @@ export type Control =
 	| 'numero'
 	| 'moneda'
 	| 'fecha'
+	| 'hora'
 	| 'escala5'
 	| 'escala10'
 	| 'opciones'
@@ -187,6 +188,36 @@ const definiciones: DefinicionTipo[] = [
 			{ clave: 'hecha', etiqueta: 'Hecha', control: 'interruptor' }
 		],
 		resumen: (p) => (p.hecha ? '✓ ' : '') + texto(p, 'texto')
+	},
+	{
+		tipo: 'evento',
+		nombre: 'Evento',
+		plural: 'Eventos',
+		icono: 'reloj',
+		tono: 'verde',
+		visibleIaPorDefecto: true,
+		descripcion: 'Algo que pasa un día concreto: reunión, cita, quedada.',
+		campoPrincipal: 'nombre',
+		campos: [
+			{
+				clave: 'nombre',
+				etiqueta: 'Qué es',
+				control: 'texto',
+				requerido: true,
+				placeholder: 'Reunión de fluxu, dentista…'
+			},
+			{ clave: 'fecha', etiqueta: 'Día', control: 'fecha', requerido: true },
+			{ clave: 'hora', etiqueta: 'Hora', control: 'hora', ayuda: 'Opcional: sin hora también vale.' },
+			{ clave: 'lugar', etiqueta: 'Dónde', control: 'texto' },
+			{ clave: 'notas', etiqueta: 'Notas', control: 'texto' }
+		],
+		resumen: (p) => {
+			const [, mes, dia] = texto(p, 'fecha').split('-');
+			const cuando = [dia && mes ? `${Number(dia)}/${Number(mes)}` : '', texto(p, 'hora')]
+				.filter(Boolean)
+				.join(' · ');
+			return `${texto(p, 'nombre')}${cuando ? ` — ${cuando}` : ''}`;
+		}
 	},
 	{
 		tipo: 'gasto',
@@ -478,6 +509,7 @@ export const TIPOS_CAPTURA = [
 	'fallo',
 	'logro',
 	'tarea',
+	'evento',
 	'gasto',
 	'frase',
 	'chiste',

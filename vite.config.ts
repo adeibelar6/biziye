@@ -76,6 +76,9 @@ export default defineConfig({
 	test: {
 		include: ['src/**/*.test.ts'],
 		environment: 'node',
+		// Crear la BD PGlite de prueba tarda >10 s cuando OneDrive/antivirus
+		// están rascando el disco; el timeout por defecto daba fallos falsos.
+		hookTimeout: 60_000,
 		alias: {
 			// Los módulos virtuales de SvelteKit no existen bajo vitest puro.
 			'$env/dynamic/private': fileURLToPath(

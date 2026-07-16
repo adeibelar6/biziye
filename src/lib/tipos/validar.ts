@@ -56,6 +56,15 @@ export function validarPayload(
 				payload[campo.clave] = String(valor);
 				break;
 			}
+			case 'hora': {
+				const coincidencia = String(valor).trim().match(/^(\d{1,2})(?:[:.h]([0-5]\d))?\s*h?$/i);
+				const horas = coincidencia ? Number(coincidencia[1]) : NaN;
+				if (!coincidencia || horas > 23) {
+					return { valido: false, error: `«${campo.etiqueta}» no es una hora válida (HH:MM).` };
+				}
+				payload[campo.clave] = `${String(horas).padStart(2, '0')}:${coincidencia[2] ?? '00'}`;
+				break;
+			}
 			case 'opciones': {
 				const valido = campo.opciones?.some((o) => o.valor === String(valor));
 				if (!valido) {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { diaLocal } from '$lib/fechas';
 import { proveedorMock } from './mock';
 import type { HerramientaIA } from './tipos';
 
@@ -38,6 +39,23 @@ describe('clasificador mock', () => {
 	it('detecta primeras veces', async () => {
 		const resultado = await proveedorMock.clasificar('primera vez que hago pan en casa');
 		expect(resultado?.tipo).toBe('primera_vez');
+	});
+
+	it('detecta eventos dictados con día y hora', async () => {
+		const resultado = await proveedorMock.clasificar(
+			'Lo primero, apunta que hoy tengo reunion de fluxu, seguramente a las 21:00 o por ahi.'
+		);
+		expect(resultado?.tipo).toBe('evento');
+		expect(resultado?.payload.nombre).toBe('Reunion de fluxu');
+		expect(resultado?.payload.fecha).toBe(diaLocal());
+		expect(resultado?.payload.hora).toBe('21:00');
+	});
+
+	it('la cita-agenda es evento; la reunión donde la liaste, fallo', async () => {
+		const cita = await proveedorMock.clasificar('mañana tengo cita con el médico a las 10');
+		expect(cita?.tipo).toBe('evento');
+		const fallo = await proveedorMock.clasificar('la he liado en la reunión por no prepararla');
+		expect(fallo?.tipo).toBe('fallo');
 	});
 
 	it('cuando no hay señal clara, devuelve null (inbox)', async () => {

@@ -68,6 +68,15 @@
 					required={campo.requerido}
 					value={valorFecha(campo.clave)}
 				/>
+			{:else if campo.control === 'hora'}
+				<input
+					class="campo"
+					id="campo-{campo.clave}"
+					name={campo.clave}
+					type="time"
+					required={campo.requerido}
+					value={valorTexto(campo.clave)}
+				/>
 			{:else if campo.control === 'escala5' || campo.control === 'escala10'}
 				<select class="campo" id="campo-{campo.clave}" name={campo.clave} required={campo.requerido}>
 					<option value="">—</option>

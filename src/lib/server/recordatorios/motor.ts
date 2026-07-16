@@ -110,6 +110,25 @@ function recordatorioDeseado(entrada: EntradaSincronizable): Deseado | null {
 		};
 	}
 
+	if (entrada.tipo === 'evento') {
+		const fecha = fechaDePayload(p.fecha);
+		if (!fecha) return null;
+		const hora = typeof p.hora === 'string' ? p.hora.match(/^(\d{1,2}):(\d{2})$/) : null;
+		if (hora) fecha.setHours(Number(hora[1]), Number(hora[2]), 0, 0);
+		return {
+			titulo: `${p.nombre ?? 'Evento'}${hora ? ` a las ${hora[1]}:${hora[2]}` : ''}`,
+			cuerpo:
+				`Lo tienes el ${fechaCorta(fecha)}` +
+				(typeof p.lugar === 'string' && p.lugar ? ` en ${p.lugar}` : '') +
+				'.',
+			tipo: 'evento',
+			fechaObjetivo: fecha,
+			regla: 'unica',
+			antelacionDias: 0,
+			payload: { url: `/entrada/${entrada.id}` }
+		};
+	}
+
 	if (entrada.tipo === 'deseo') {
 		if (p.estado !== 'enfriando') return null;
 		return {

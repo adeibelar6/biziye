@@ -14,8 +14,9 @@
 
 Una app personal de vida, de **un solo usuario**: una PWA instalable en el
 móvil donde se registra todo — fallos, logros, notas, gastos, métricas
-diarias, frases, chistes, primeras veces, tareas, cine, suscripciones,
-vencimientos, préstamos, deseos — y una capa de IA que lo clasifica al vuelo,
+diarias, frases, chistes, primeras veces, tareas, eventos, cine,
+suscripciones, vencimientos, préstamos, deseos — y una capa de IA que lo
+clasifica al vuelo,
 responde en un chat con acceso a los datos, guía el cierre del día y la
 revisión semanal, escribe el informe mensual y mantiene un **perfil vivo**
 sobre ti.
@@ -37,7 +38,7 @@ real contra la app en marcha antes de pasar a la siguiente:
 | 3 — Vida práctica | `444af60` | Motor de recordatorios + Web Push, suscripciones, vencimientos, préstamos, deseos (nevera 30 días), cine completo, anti-abandono |
 | 4 — La IA aprende | `e5aa950` | Perfil vivo versionado, briefing matinal, informe mensual, revisión semanal, exportación JSON, seed de demostración |
 
-**57 tests** en verde (vitest, contra PGlite real con las migraciones de
+**72 tests** en verde (vitest, contra PGlite real con las migraciones de
 producción, no contra mocks) y typecheck sin errores.
 
 Ajustes tras el estreno, pedidos usando la app de verdad (2026-07-16):
@@ -47,6 +48,7 @@ Ajustes tras el estreno, pedidos usando la app de verdad (2026-07-16):
 | `47341ac` | Hoy: las métricas de un toque solo se ofrecen desde las 19:00, como el cierre — por la mañana estorbaban |
 | `3392825` | Cine: alta directa como vista (nota obligatoria y fecha, hoy por defecto), pestaña activa en la URL, filmoteca sin el tope de 100 |
 | `54fb9f1` | docs: el puente de IA desplegado (ChatMock) y cómo recuperarlo |
+| — | Tipo **evento** (reunión, cita, quedada): «apunta que hoy tengo reunión de fluxu a las 21:00» ya no cae al inbox — el clasificador recibe la fecha y hora actuales para resolver «hoy / mañana / el viernes / a las 9», limpia las muletillas del dictado, y el evento crea su aviso (push la mañana del día y «Avisos a la vista» en Hoy). El mock también lo entiende (con extracción de fecha/hora en `desde-texto.ts`) |
 
 ## Cómo está montado
 

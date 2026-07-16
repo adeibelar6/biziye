@@ -6,6 +6,7 @@ import type {
 	ProveedorIA
 } from './tipos';
 import { TIPOS } from '$lib/tipos';
+import { diaLocal, diaSemana, horaCorta } from '$lib/fechas';
 
 /**
  * Proveedor OpenAI (API oficial de pago por uso) hablando el protocolo
@@ -88,6 +89,7 @@ export function crearProveedorOpenAI(config: ConfigOpenAI): ProveedorIA {
 				)
 				.join('\n');
 
+			const ahora = new Date();
 			const eleccion = await llamar({
 				temperature: 0.1,
 				response_format: { type: 'json_object' },
@@ -96,10 +98,16 @@ export function crearProveedorOpenAI(config: ConfigOpenAI): ProveedorIA {
 						role: 'system',
 						content:
 							INSTRUCCIONES_BASE +
+							`\nHoy es ${diaSemana(ahora)}, ${diaLocal(ahora)}, y son las ${horaCorta(ahora)} (Europe/Madrid).` +
 							'\nClasificas una captura de texto libre en uno de estos tipos de entrada:\n' +
 							tipos +
 							'\nResponde SOLO un JSON: {"tipo": string, "payload": object, "tags": string[], "confianza": number 0-1}. ' +
 							'El payload usa las claves del tipo elegido (los campos con * son obligatorios). ' +
+							'Fechas en formato YYYY-MM-DD y horas en HH:MM; resuelve las referencias relativas ' +
+							'(«hoy», «mañana», «el viernes», «a las 9») con la fecha y hora de arriba. ' +
+							'La captura puede venir dictada, con la orden y muletillas («apunta que», «lo primero», ' +
+							'«o por ahí»): rellena el payload con el contenido limpio, sin la orden ni las coletillas. ' +
+							'Que un dato sea aproximado no baja la confianza: elige el valor más probable. ' +
 							'Si el texto no encaja claramente en ningún tipo, usa confianza baja (<0.5).'
 					},
 					{ role: 'user', content: texto }

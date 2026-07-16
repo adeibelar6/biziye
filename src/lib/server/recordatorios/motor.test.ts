@@ -135,6 +135,29 @@ describe('ciclo entrada → recordatorio → disparo', () => {
 		expect(await recordatorioDe(tarea.id)).toBeNull();
 	});
 
+	it('un evento apunta su recordatorio a la hora del día señalado', async () => {
+		const { crearEntrada } = await import('$lib/server/entradas');
+		const manana = new Date();
+		manana.setDate(manana.getDate() + 1);
+
+		const entrada = await crearEntrada(userId, {
+			tipo: 'evento',
+			payload: {
+				nombre: 'Reunión de fluxu',
+				fecha: manana.toISOString().slice(0, 10),
+				hora: '21:00'
+			}
+		});
+
+		const recordatorio = await recordatorioDe(entrada.id);
+		expect(recordatorio).not.toBeNull();
+		expect(recordatorio!.titulo).toContain('Reunión de fluxu');
+		expect(recordatorio!.titulo).toContain('21:00');
+		expect(recordatorio!.fechaObjetivo.getHours()).toBe(21);
+		// El aviso llega la mañana del evento, a las 09:00.
+		expect(recordatorio!.proximoAviso?.getHours()).toBe(9);
+	});
+
 	it('borrar la entrada borra el recordatorio', async () => {
 		const { crearEntrada, borrarEntrada } = await import('$lib/server/entradas');
 		const entrada = await crearEntrada(userId, {
